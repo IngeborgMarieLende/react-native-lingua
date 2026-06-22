@@ -1,0 +1,131 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+
+@import "nativewind/theme";
+
+/* ─── Lingua Design System ─── */
+
+@theme {
+  /* ── Primary colors ── */
+  --color-lingua-purple: #6C4EF5;
+  --color-lingua-deep-purple: #5B3BF6;
+  --color-lingua-blue: #4D8BFF;
+  --color-lingua-green: #21C16B;
+
+  /* ── Semantic colors ── */
+  --color-success: #21C16B;
+  --color-warning: #FFC800;
+  --color-streak: #FF8A00;
+  --color-error: #FF4D4F;
+  --color-info: #4D8BFF;
+
+  /* ── Neutral colors ── */
+  --color-text-primary: #0D132B;
+  --color-text-secondary: #6B7280;
+  --color-border: #E5E7EB;
+  --color-surface: #F6F7FB;
+  --color-background: #FFFFFF;
+
+  /* ── Font family ── */
+  --font-family-poppins: "Poppins";
+  --font-family-poppins-bold: "Poppins-Bold";
+  --font-family-poppins-semibold: "Poppins-SemiBold";
+  --font-family-poppins-medium: "Poppins-Medium";
+  --font-family-poppins-regular: "Poppins-Regular";
+
+  /* ── Font sizes ── */
+  --font-size-h1: 32px;
+  --font-size-h2: 24px;
+  --font-size-h3: 20px;
+  --font-size-h4: 16px;
+  --font-size-body-lg: 16px;
+  --font-size-body-md: 14px;
+  --font-size-body-sm: 13px;
+  --font-size-caption: 11px;
+
+  /* ── Line heights ── */
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.3;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.6;
+}
+
+/* ─── Typography utilities (BEM-style) ─── */
+
+@layer utilities {
+  /* Headings */
+  h1 {
+    font-family: var(--font-family-poppins-bold);
+    font-size: var(--font-size-h1);
+    line-height: var(--line-height-tight);
+    color: var(--color-text-primary);
+  }
+
+  h2 {
+    font-family: var(--font-family-poppins-semibold);
+    font-size: var(--font-size-h2);
+    line-height: var(--line-height-snug);
+    color: var(--color-text-primary);
+  }
+
+  h3 {
+    font-family: var(--font-family-poppins-semibold);
+    font-size: var(--font-size-h3);
+    line-height: var(--line-height-snug);
+    color: var(--color-text-primary);
+  }
+
+  h4 {
+    font-family: var(--font-family-poppins-medium);
+    font-size: var(--font-size-h4);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-primary);
+  }
+
+  /* Body */
+  .text-body-lg {
+    font-family: var(--font-family-poppins-regular);
+    font-size: var(--font-size-body-lg);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-primary);
+  }
+
+  .text-body-md {
+    font-family: var(--font-family-poppins-regular);
+    font-size: var(--font-size-body-md);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-primary);
+  }
+
+  .text-body-sm {
+    font-family: var(--font-family-poppins-regular);
+    font-size: var(--font-size-body-sm);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-primary);
+  }
+
+  .text-caption {
+    font-family: var(--font-family-poppins-regular);
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-secondary);
+  }
+
+  /* Font weight shortcuts */
+  .font-poppins {
+    font-family: var(--font-family-poppins-regular);
+  }
+
+  .font-poppins-medium {
+    font-family: var(--font-family-poppins-medium);
+  }
+
+  .font-poppins-semibold {
+    font-family: var(--font-family-poppins-semibold);
+  }
+
+  .font-poppins-bold {
+    font-family: var(--font-family-poppins-bold);
+  }
+}
