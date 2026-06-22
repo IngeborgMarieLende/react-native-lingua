@@ -1,11 +1,44 @@
 import "../../global.css";
 
-import { Stack } from "expo-router";
+import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
+import { tokenCache } from "@clerk/clerk-expo/token-cache";
+
+import { Redirect, Stack, useRouter, useSegments } from "expo-router";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+
+if (!publishableKey) {
+  throw new Error("Add EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY to your .env file");
+}
+
 SplashScreen.preventAutoHideAsync();
+
+function InitialLayout() {
+  const { isSignedIn, isLoaded } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const isPublicRoute = ["sign-in", "sign-up", "onboarding"].includes(
+      segments[0] as string
+    );
+
+    if (!isSignedIn && !isPublicRoute) {
+      router.replace("/onboarding");
+    } else if (isSignedIn && isPublicRoute) {
+      router.replace("/");
+    }
+  }, [isSignedIn, isLoaded, segments]);
+
+  if (!isLoaded) return null;
+
+  return <Stack screenOptions={{ headerShown: false }} />;
+}
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -26,6 +59,8 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }} />
+    <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+      <InitialLayout />
+    </ClerkProvider>
   );
 }

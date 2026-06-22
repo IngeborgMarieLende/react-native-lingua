@@ -76,7 +76,7 @@ export default function OnboardingScreen() {
         <View className="px-6 pb-6">
           <TouchableOpacity
             className="bg-lingua-purple rounded-2xl py-4 flex-row items-center justify-center"
-            onPress={() => router.replace("/")}
+            onPress={() => router.push("/sign-up")}
             activeOpacity={0.85}
           >
             <Text className="text-white font-poppins-semibold" style={{ fontSize: 18 }}>
