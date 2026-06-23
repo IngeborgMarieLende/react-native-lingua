@@ -3,10 +3,11 @@ import "../../global.css";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 
-import { Redirect, Stack, useRouter, useSegments } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { useLanguageStore } from "@/store/languageStore";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -20,22 +21,30 @@ function InitialLayout() {
   const { isSignedIn, isLoaded } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const { selectedLanguageId, _hasHydrated } = useLanguageStore();
 
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isLoaded || !_hasHydrated) return;
 
     const isPublicRoute = ["sign-in", "sign-up", "onboarding"].includes(
       segments[0] as string
     );
+    const isLanguageSelect = segments[0] === "language-select";
 
     if (!isSignedIn && !isPublicRoute) {
       router.replace("/onboarding");
     } else if (isSignedIn && isPublicRoute) {
-      router.replace("/");
+      if (!selectedLanguageId) {
+        router.replace("/language-select");
+      } else {
+        router.replace("/(tabs)/home");
+      }
+    } else if (isSignedIn && !selectedLanguageId && !isLanguageSelect) {
+      router.replace("/language-select");
     }
-  }, [isSignedIn, isLoaded, segments]);
+  }, [isSignedIn, isLoaded, segments, selectedLanguageId, _hasHydrated]);
 
-  if (!isLoaded) return null;
+  if (!isLoaded || !_hasHydrated) return null;
 
   return <Stack screenOptions={{ headerShown: false }} />;
 }
