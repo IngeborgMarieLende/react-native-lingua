@@ -3,11 +3,14 @@ import "../../global.css";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 
-import { Stack, useRouter, useSegments } from "expo-router";
+import { Stack, useRouter, useSegments, usePathname, useGlobalSearchParams } from "expo-router";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useLanguageStore } from "@/store/languageStore";
+import { PostHogProvider } from "posthog-react-native";
+import { posthog } from "@/lib/posthog";
+import { StreamVideoProvider } from "@/components/StreamVideoProvider";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -22,6 +25,20 @@ function InitialLayout() {
   const segments = useSegments();
   const router = useRouter();
   const { selectedLanguageId, _hasHydrated } = useLanguageStore();
+  const pathname = usePathname();
+  const params = useGlobalSearchParams();
+  const previousPathname = useRef<string | undefined>(undefined);
+
+  // Manual screen tracking for Expo Router
+  useEffect(() => {
+    if (previousPathname.current !== pathname) {
+      posthog.screen(pathname, {
+        previous_screen: previousPathname.current ?? null,
+        ...params,
+      });
+      previousPathname.current = pathname;
+    }
+  }, [pathname, params]);
 
   useEffect(() => {
     if (!isLoaded || !_hasHydrated) return;
@@ -69,7 +86,19 @@ export default function RootLayout() {
 
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-      <InitialLayout />
+      <PostHogProvider
+        client={posthog}
+        autocapture={{
+          captureScreens: true,
+          captureTouches: true,
+          propsToCapture: ["testID"],
+          maxElementsCaptured: 20,
+        }}
+      >
+        <StreamVideoProvider>
+          <InitialLayout />
+        </StreamVideoProvider>
+      </PostHogProvider>
     </ClerkProvider>
   );
 }

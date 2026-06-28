@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useSignUp } from "@clerk/clerk-expo";
+import { usePostHog } from "posthog-react-native";
 import { VerificationModal } from "../components/VerificationModal";
 
 function SocialButton({
@@ -77,6 +78,7 @@ function SocialButton({
 export default function SignUpScreen() {
   const router = useRouter();
   const { signUp, setActive, isLoaded } = useSignUp();
+  const posthog = usePostHog();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -93,7 +95,9 @@ export default function SignUpScreen() {
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
       setShowModal(true);
     } catch (err: any) {
-      setError(err?.errors?.[0]?.message ?? "Something went wrong. Please try again.");
+      const message = err?.errors?.[0]?.message ?? "Something went wrong. Please try again.";
+      setError(message);
+      posthog.capture("sign_up_failed", { error_message: message });
     } finally {
       setIsSubmitting(false);
     }
@@ -104,6 +108,12 @@ export default function SignUpScreen() {
     const result = await signUp.attemptEmailAddressVerification({ code });
     if (result.status === "complete") {
       await setActive({ session: result.createdSessionId! });
+
+      posthog.identify(email, {
+        $set_once: { first_sign_up_date: new Date().toISOString() },
+      });
+      posthog.capture("user_signed_up");
+
       setShowModal(false);
       router.replace("/");
     } else {

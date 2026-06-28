@@ -1,9 +1,16 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { usePostHog } from "posthog-react-native";
 
 export default function OnboardingScreen() {
   const router = useRouter();
+  const posthog = usePostHog();
+
+  function handleGetStarted() {
+    posthog.capture("onboarding_get_started_tapped");
+    router.push("/sign-up");
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top", "bottom"]}>
@@ -76,7 +83,7 @@ export default function OnboardingScreen() {
         <View className="px-6 pb-6">
           <TouchableOpacity
             className="bg-lingua-purple rounded-2xl py-4 flex-row items-center justify-center"
-            onPress={() => router.push("/sign-up")}
+            onPress={handleGetStarted}
             activeOpacity={0.85}
           >
             <Text className="text-white font-poppins-semibold" style={{ fontSize: 18 }}>

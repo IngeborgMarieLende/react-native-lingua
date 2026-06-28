@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { usePostHog } from "posthog-react-native";
 import { LANGUAGES } from "@/data/languages";
 import type { Language } from "@/types/learning";
 import { useLanguageStore } from "@/store/languageStore";
@@ -114,6 +115,7 @@ function LanguageCard({
 
 export default function LanguageSelectScreen() {
   const router = useRouter();
+  const posthog = usePostHog();
   const setSelectedLanguage = useLanguageStore((s) => s.setSelectedLanguage);
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -130,7 +132,11 @@ export default function LanguageSelectScreen() {
   const selectedLanguage = LANGUAGES.find((l) => l.id === selectedId);
 
   function handleConfirm() {
-    if (!selectedId) return;
+    if (!selectedId || !selectedLanguage) return;
+    posthog.capture("language_selected", {
+      language_id: selectedId,
+      language_name: selectedLanguage.name,
+    });
     setSelectedLanguage(selectedId);
     router.replace("/");
   }

@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
+import { usePostHog } from "posthog-react-native";
 import { useLanguageStore } from "@/store/languageStore";
 import { getLanguageById } from "@/data/languages";
 import { getUnitsByLanguage } from "@/data/units";
@@ -51,6 +52,7 @@ const TODAY_PLAN_ITEMS = [
 export default function HomeScreen() {
   const { user } = useUser();
   const { selectedLanguageId } = useLanguageStore();
+  const posthog = usePostHog();
 
   const language = selectedLanguageId ? getLanguageById(selectedLanguageId) : null;
   const units = selectedLanguageId ? getUnitsByLanguage(selectedLanguageId) : [];
@@ -59,6 +61,21 @@ export default function HomeScreen() {
 
   const xpProgress = DAILY_XP / DAILY_GOAL_XP;
   const firstName = user?.firstName ?? "there";
+
+  function handleContinueLesson() {
+    posthog.capture("lesson_continued", {
+      language_id: selectedLanguageId,
+      unit_title: currentUnit?.title,
+      level: levelLabel,
+    });
+  }
+
+  function handleDailyPlanItemTap(item: typeof TODAY_PLAN_ITEMS[number]) {
+    posthog.capture("daily_plan_item_tapped", {
+      item_title: item.title,
+      item_done: item.done,
+    });
+  }
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-background">
@@ -257,6 +274,7 @@ export default function HomeScreen() {
                       paddingVertical: 8,
                     }}
                     activeOpacity={0.8}
+                    onPress={handleContinueLesson}
                   >
                     <Text
                       style={{
@@ -322,6 +340,7 @@ export default function HomeScreen() {
                 <TouchableOpacity
                   key={item.id}
                   activeOpacity={0.7}
+                  onPress={() => handleDailyPlanItemTap(item)}
                   style={{
                     flexDirection: "row",
                     alignItems: "center",

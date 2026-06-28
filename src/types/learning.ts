@@ -110,4 +110,5 @@ export interface Unit {
   languageId: string;
   level: number;
   lessons: Lesson[];
+  imageUrl?: string;
 }
